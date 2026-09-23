@@ -41,6 +41,8 @@ Die kompakten `SCHWIMMKURS_…`-Namen entsprechen den Spring-Boot-Regeln für En
 ## Lokal bauen und ausführen
 
 ```bash
+git clone https://github.com/jensGiehl/swim-ft.git
+cd swim-ft
 mvn clean verify
 
 java -jar target/schwimmkurs-ft-0.0.1-SNAPSHOT.jar \
@@ -52,7 +54,7 @@ Der Prozess prüft genau einmal und beendet sich anschließend. Ein Fehler führ
 
 ## Docker Image
 
-Bei jedem Push auf `main` oder `master` baut die GitHub Action ein Multi-Arch-Image und veröffentlicht es unter `ghcr.io/OWNER/REPOSITORY:latest` in der GitHub Container Registry.
+Bei jedem Push auf `main` oder `master` baut die GitHub Action ein Multi-Arch-Image und veröffentlicht es unter `ghcr.io/jensgiehl/swim-ft:latest` in der GitHub Container Registry des [Repositories](https://github.com/jensGiehl/swim-ft).
 
 Ein beispielhafter manueller Start gemäß dem üblichen Container-Schema:
 
@@ -66,7 +68,7 @@ docker run -d \
   -v /opt/schwimmkurs-ft:/data \
   -e TELEGRAM_BOT_TOKEN="BOT_TOKEN" \
   -e TELEGRAM_CHAT_ID="CHAT_ID" \
-  ghcr.io/OWNER/REPOSITORY:latest
+  ghcr.io/jensgiehl/swim-ft:latest
 ```
 
 `8089` ist dabei der Port auf dem Host. Die Anwendung besitzt absichtlich keinen Webserver und öffnet daher keinen Port; die Portweiterleitung ist technisch nicht erforderlich und kann entfernt werden. Das Verzeichnis `/opt/schwimmkurs-ft` wird nach `/data` eingebunden, damit Snapshot und Datum des letzten Health-Checks Container-Neustarts überleben.
@@ -84,7 +86,7 @@ Weitere Properties lassen sich auf die gleiche Weise übergeben, zum Beispiel:
 Der folgende Eintrag startet alle fünf Minuten einen kurzlebigen Container. `flock` verhindert überlappende Containerläufe; die Anwendung verwendet zusätzlich eine Dateisperre im Datenverzeichnis.
 
 ```cron
-*/5 * * * * flock -n /tmp/schwimmkurs-ft-cron.lock docker run --rm --pull=always --name schwimmkurs-ft -v /opt/schwimmkurs-ft:/data -e TELEGRAM_BOT_TOKEN='BOT_TOKEN' -e TELEGRAM_CHAT_ID='CHAT_ID' ghcr.io/OWNER/REPOSITORY:latest >> /var/log/schwimmkurs-ft.log 2>&1
+*/5 * * * * flock -n /tmp/schwimmkurs-ft-cron.lock docker run --rm --pull=always --name schwimmkurs-ft -v /opt/schwimmkurs-ft:/data -e TELEGRAM_BOT_TOKEN='BOT_TOKEN' -e TELEGRAM_CHAT_ID='CHAT_ID' ghcr.io/jensgiehl/swim-ft:latest >> /var/log/schwimmkurs-ft.log 2>&1
 ```
 
 Das persistente Verzeichnis muss vorher existieren und für den Container-Benutzer mit UID `10001` schreibbar sein:
