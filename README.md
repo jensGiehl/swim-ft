@@ -65,13 +65,13 @@ docker run -d \
   --name schwimmkurs-ft \
   --pull=always \
   -p 8089:8080 \
-  -v /opt/schwimmkurs-ft:/data \
+  -v /opt/schwimmkurs-ft:/app/data \
   -e TELEGRAM_BOT_TOKEN="BOT_TOKEN" \
   -e TELEGRAM_CHAT_ID="CHAT_ID" \
   ghcr.io/jensgiehl/swim-ft:latest
 ```
 
-`8089` ist dabei der Port auf dem Host. Die Anwendung besitzt absichtlich keinen Webserver und öffnet daher keinen Port; die Portweiterleitung ist technisch nicht erforderlich und kann entfernt werden. Das Verzeichnis `/opt/schwimmkurs-ft` wird nach `/data` eingebunden, damit Snapshot und Datum des letzten Health-Checks Container-Neustarts überleben.
+`8089` ist dabei der Port auf dem Host. Die Anwendung besitzt absichtlich keinen Webserver und öffnet daher keinen Port; die Portweiterleitung ist technisch nicht erforderlich und kann entfernt werden. Das Verzeichnis `/opt/schwimmkurs-ft` wird nach `/app/data` eingebunden, weil die relativen Standardpfade `./data/...` durch das Arbeitsverzeichnis `/app` im Container dort aufgelöst werden. Dadurch überleben Snapshot und Datum des letzten Health-Checks Container-Neustarts.
 
 Weitere Properties lassen sich auf die gleiche Weise übergeben, zum Beispiel:
 
@@ -86,13 +86,33 @@ Weitere Properties lassen sich auf die gleiche Weise übergeben, zum Beispiel:
 Der folgende Eintrag startet alle fünf Minuten einen kurzlebigen Container. `flock` verhindert überlappende Containerläufe; die Anwendung verwendet zusätzlich eine Dateisperre im Datenverzeichnis.
 
 ```cron
-*/5 * * * * flock -n /tmp/schwimmkurs-ft-cron.lock docker run --rm --pull=always --name schwimmkurs-ft -v /opt/schwimmkurs-ft:/data -e TELEGRAM_BOT_TOKEN='BOT_TOKEN' -e TELEGRAM_CHAT_ID='CHAT_ID' ghcr.io/jensgiehl/swim-ft:latest >> /var/log/schwimmkurs-ft.log 2>&1
+*/5 * * * * /usr/bin/flock -n /tmp/schwimmkurs-ft-cron.lock /usr/bin/docker run --rm --pull=always --name schwimmkurs-ft -v /opt/schwimmkurs-ft:/app/data -e TELEGRAM_BOT_TOKEN='BOT_TOKEN' -e TELEGRAM_CHAT_ID='CHAT_ID' ghcr.io/jensgiehl/swim-ft:latest >> /var/log/schwimmkurs-ft.log 2>&1
 ```
 
 Das persistente Verzeichnis muss vorher existieren und für den Container-Benutzer mit UID `10001` schreibbar sein:
 
 ```bash
 sudo install -d -o 10001 -g 10001 /opt/schwimmkurs-ft
+```
+
+### Docker als Snap-Paket
+
+Bei einer Installation von Docker als Snap-Paket befindet sich das Programm üblicherweise unter `/snap/bin/docker`. Cron besitzt oft keinen Eintrag für `/snap/bin` im `PATH`, weshalb im Cronjob der absolute Pfad verwendet werden sollte. Außerdem darf der strikt isolierte Docker-Snap `/opt` nicht als Quelle eines Bind-Mounts verwenden. Ein geeigneter Datenpfad ist `/var/snap/docker/common`:
+
+```bash
+sudo install -d -o 10001 -g 10001 /var/snap/docker/common/schwimmkurs-ft
+```
+
+Der passende Cron-Eintrag lautet:
+
+```cron
+*/5 * * * * /usr/bin/flock -n /tmp/schwimmkurs-ft-cron.lock /snap/bin/docker run --rm --pull=always --name schwimmkurs-ft -v /var/snap/docker/common/schwimmkurs-ft:/app/data -e TELEGRAM_BOT_TOKEN='BOT_TOKEN' -e TELEGRAM_CHAT_ID='CHAT_ID' ghcr.io/jensgiehl/swim-ft:latest >> /var/log/schwimmkurs-ft.log 2>&1
+```
+
+Die Logausgabe kann einschließlich Logrotation fortlaufend beobachtet werden:
+
+```bash
+sudo tail -F /var/log/schwimmkurs-ft.log
 ```
 
 ## Vergleichsverhalten
