@@ -63,8 +63,9 @@ public class MonitorService {
                 .orElseGet(() -> new MonitorState(now, offers, null));
 
         if (previousState.isEmpty()) {
+            telegramClient.send(messageFactory.startupMessage());
             stateRepository.save(state);
-            LOGGER.info("Erster Snapshot mit {} Angeboten gespeichert. Es wird keine Änderungsnachricht gesendet.", offers.size());
+            LOGGER.info("Startmeldung gesendet und erster Snapshot mit {} Angeboten gespeichert.", offers.size());
         } else {
             var diff = CourseDiff.between(previousState.orElseThrow().offers(), offers);
             if (diff.hasChanges()) {

@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -33,7 +35,7 @@ class MonitorServiceTest {
     private static final ZoneId ZONE_ID = ZoneId.of("Europe/Berlin");
 
     @Test
-    void firstRunStoresSnapshotWithoutChangeNotification() {
+    void firstRunSendsStartupMessageAndStoresSnapshot() {
         var fixture = fixture("2026-09-23T12:00:00Z");
         var offer = offer("2");
         when(fixture.pageClient.fetchOffers()).thenReturn(List.of(offer));
@@ -41,10 +43,24 @@ class MonitorServiceTest {
 
         fixture.service.check();
 
-        verify(fixture.telegramClient, never()).send(org.mockito.ArgumentMatchers.anyString());
+        verify(fixture.telegramClient).send(org.mockito.ArgumentMatchers.startsWith("🏊 Der Schwimmkurs-Monitor"));
         var state = ArgumentCaptor.forClass(MonitorState.class);
         verify(fixture.stateRepository).save(state.capture());
         assertThat(state.getValue().offers()).containsExactly(offer);
+    }
+
+    @Test
+    void firstRunDoesNotStoreSnapshotWhenStartupMessageFails() {
+        var fixture = fixture("2026-09-23T12:00:00Z");
+        when(fixture.pageClient.fetchOffers()).thenReturn(List.of());
+        when(fixture.stateRepository.load()).thenReturn(Optional.empty());
+        doThrow(new IllegalStateException("Telegram nicht erreichbar"))
+                .when(fixture.telegramClient).send(org.mockito.ArgumentMatchers.anyString());
+
+        assertThatThrownBy(fixture.service::check)
+                .isInstanceOf(IllegalStateException.class);
+
+        verify(fixture.stateRepository, never()).save(org.mockito.ArgumentMatchers.any(MonitorState.class));
     }
 
     @Test

@@ -13,6 +13,11 @@ public class MessageFactory {
         this.properties = properties;
     }
 
+    public String startupMessage() {
+        return "🏊 Der Schwimmkurs-Monitor macht sich nun an die Arbeit."
+                + "\n\nZur Kursseite:\n" + properties.source().url();
+    }
+
     public String changeMessage(CourseDiff diff, int currentOfferCount) {
         var message = new StringBuilder("🏊 Änderung bei den Schwimmkursen\n");
         if (!diff.added().isEmpty()) {
