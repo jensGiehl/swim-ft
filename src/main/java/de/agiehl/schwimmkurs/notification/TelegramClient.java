@@ -6,10 +6,16 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestClient;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Component
 public class TelegramClient {
+
+    private static final MediaType UTF_8_FORM = new MediaType(
+            MediaType.APPLICATION_FORM_URLENCODED,
+            StandardCharsets.UTF_8
+    );
 
     private final SchwimmkursProperties properties;
     private final RestClient restClient;
@@ -29,7 +35,7 @@ public class TelegramClient {
             form.add("disable_notification", Boolean.toString(properties.telegram().disableNotification()));
             restClient.post()
                     .uri("/bot{token}/sendMessage", properties.telegram().botToken())
-                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                    .contentType(UTF_8_FORM)
                     .body(form)
                     .retrieve()
                     .toBodilessEntity();
