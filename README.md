@@ -14,7 +14,7 @@ Den Bot legt man über [@BotFather](https://t.me/BotFather) an. Nachdem dem Bot 
 
 ## Konfiguration
 
-Alle Einstellungen sind Spring-Boot-Properties und können über eine externe Properties-Datei, Kommandozeilenargumente oder Umgebungsvariablen gesetzt werden.
+Alle Einstellungen sind Spring-Boot-Properties und können über eine externe Konfigurationsdatei, Kommandozeilenargumente oder Umgebungsvariablen gesetzt werden. Die mitgelieferte `application.yaml` wird als UTF-8 gelesen. Für externe Texte mit Umlauten sollte ebenfalls YAML in UTF-8 verwendet werden.
 
 | Property | Umgebungsvariable | Standardwert / Bedeutung |
 |---|---|---|

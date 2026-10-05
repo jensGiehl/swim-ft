@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: schwimmkurs-ft
+  main:
+    web-application-type: none
+    banner-mode: off
+
+schwimmkurs:
+  source:
+    url: "https://baeder-ft.baeder-suite.de/de/bookings/block_list/course_id/555/?tab=154&items_per_page=100&page=1"
+    table-selector: "#block_list_154"
+    user-agent: "Mozilla/5.0 (X11; Linux x86_64; rv:143.0) Gecko/20100101 Firefox/143.0"
+    connect-timeout: 10s
+    read-timeout: 30s
+  state:
+    file: ./data/schwimmkurs-state.bin
+    lock-file: ./data/schwimmkurs-state.lock
+  telegram:
+    api-base-url: https://api.telegram.org
+    bot-token: "${TELEGRAM_BOT_TOKEN:}"
+    chat-id: "${TELEGRAM_CHAT_ID:}"
+    disable-notification: false
+    maximum-message-length: 3900
+  health-check:
+    enabled: true
+    day-of-week: SUNDAY
+    earliest-time: "18:00"
+    zone-id: Europe/Berlin
+    message: Schwimmkurs-Monitor läuft weiterhin und konnte die Kursseite erfolgreich prüfen.
