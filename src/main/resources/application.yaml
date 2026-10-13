@@ -26,4 +26,4 @@ schwimmkurs:
     day-of-week: SUNDAY
     earliest-time: "18:00"
     zone-id: Europe/Berlin
-    message: Schwimmkurs-Monitor läuft weiterhin und konnte die Kursseite erfolgreich prüfen.
+    message: Der Schwimmkurs-Monitor sucht weiterhin nach neuen Kursterminen. Sobald neue Termine oder Änderungen gefunden werden, werden sie hier gepostet.

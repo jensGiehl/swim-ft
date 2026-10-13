@@ -25,8 +25,8 @@ class ApplicationConfigurationTest {
                 .orElseThrow(() -> new IllegalStateException("Die Standardkonfiguration konnte nicht geladen werden."));
 
         assertThat(properties.healthCheck().message())
-                .isEqualTo("Schwimmkurs-Monitor läuft weiterhin und konnte die Kursseite erfolgreich prüfen.");
+                .isEqualTo("Der Schwimmkurs-Monitor sucht weiterhin nach neuen Kursterminen. Sobald neue Termine oder Änderungen gefunden werden, werden sie hier gepostet.");
         assertThat(new MessageFactory(properties).healthCheckMessage())
-                .startsWith("✅ Schwimmkurs-Monitor läuft weiterhin und konnte die Kursseite erfolgreich prüfen.");
+                .startsWith("✅ Der Schwimmkurs-Monitor sucht weiterhin nach neuen Kursterminen. Sobald neue Termine oder Änderungen gefunden werden, werden sie hier gepostet.");
     }
 }

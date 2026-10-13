@@ -2,7 +2,7 @@
 
 Eine Spring-Boot-CLI-Anwendung ohne Webserver. Sie liest die verfügbaren Termine des konfigurierten Schwimmkurses, vergleicht sie mit dem letzten erfolgreichen Lauf und sendet Änderungen über einen Telegram-Bot. Telegram-Nachrichten werden explizit als UTF-8 übertragen, damit deutsche Umlaute zuverlässig erhalten bleiben.
 
-Beim allerersten Lauf sendet der Monitor einmalig eine Startmeldung und speichert anschließend den Ausgangszustand. Jeden Sonntag wird beim ersten erfolgreichen Lauf ab 18:00 Uhr (Zeitzone `Europe/Berlin`) einmalig ein Health-Check gesendet. Jede Telegram-Nachricht enthält den Link zur Kursseite.
+Beim allerersten Lauf sendet der Monitor einmalig eine Startmeldung und speichert anschließend den Ausgangszustand. Jeden Sonntag wird beim ersten erfolgreichen Lauf ab 18:00 Uhr (Zeitzone `Europe/Berlin`) einmalig ein Health-Check gesendet. Die Meldung bestätigt, dass weiterhin nach neuen Kursterminen gesucht wird und neue Termine oder Änderungen automatisch im selben Telegram-Chat gepostet werden. Jede Telegram-Nachricht enthält den Link zur Kursseite.
 
 ## Voraussetzungen
 
